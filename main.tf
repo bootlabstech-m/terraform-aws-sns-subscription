@@ -1,7 +1,11 @@
 resource "aws_sns_topic_subscription" "subscription" {
-  for_each               = { for subs in var.subscription_details : subs.topic_arn => subs } 
-  topic_arn              = each.value.topic_arn
-  protocol               = each.value.protocol
-  endpoint               = each.value.endpoint
-  endpoint_auto_confirms = each.value.endpoint_auto_confirms
+  topic_arn                       = var.topic_arn
+  protocol                        = var.protocol
+  endpoint                        = var.endpoint
+  subscription_role_arn           = var.protocol == "firehose" ? var.subscription_role_arn : null
+  endpoint_auto_confirms          = var.endpoint_auto_confirms
+  confirmation_timeout_in_minutes = var.confirmation_timeout_in_minutes
+    lifecycle {
+    ignore_changes = [delivery_policy,filter_policy,redrive_policy]
+  }
 }
